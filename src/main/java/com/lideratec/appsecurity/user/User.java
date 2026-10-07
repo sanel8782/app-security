@@ -4,16 +4,23 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 public class User implements UserDetails {
+
+    public enum Role {
+        USER,
+        ADMIN
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +32,15 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING) //Guarda el rol como texto ("USER", "ADMIN") en la BD
+    private Role role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        //Spring Security necesita ver los roles con el prefijo "ROLE_"
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
     //Métodos obligatorios de la interfaz UserDetails
     @Override
     public String getUsername() {
@@ -34,12 +50,6 @@ public class User implements UserDetails {
     @Override
     public String getPassword() {
         return password; // Retorna tu contraseña encriptada
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Retornaria los roles o permisos del usuario (por ahora vacío o roles básicos)
-        return Collections.emptyList();
     }
 
     @Override

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import com.lideratec.appsecurity.user.User;
 import com.lideratec.appsecurity.user.UserRepository;
 
+import java.util.HashMap;
+import java.util.Map;
+
 //cifra la contraseña con BCrypt antes de mandarla al repositorio.
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class AuthService {
         User nuevoUsuario = new User();
         nuevoUsuario.setEmail(request.getEmail());
         nuevoUsuario.setPassword(passwordSeguro);
+        nuevoUsuario.setRole(User.Role.USER); //asignamos un rol por defecto
 
         userRepository.save(nuevoUsuario);
     }
@@ -44,7 +48,11 @@ public class AuthService {
         //si es correcto, cargamos los detalles del usuario
         UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
 
-        //generamos y retornamos el token JWT
-        return jwtService.generateToken(user);
+        //crear los claims adicionales con los roles del usuario
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("roles", user.getAuthorities()); // Guarda los roles dentro del token
+
+        //genera el token pasándole los claims adicionales
+        return jwtService.generateToken(extraClaims, user);
     }
 }

@@ -3,6 +3,7 @@ package com.lideratec.appsecurity.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -44,7 +45,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Desactivar CSRF para APIs REST
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll() // Rutas públicas de login/registro
-                        .requestMatchers("/products/**", "/orders/**").authenticated() // Rutas protegidas que mencionaste
+                        .requestMatchers(HttpMethod.GET, "/products/**").hasAnyRole("USER", "ADMIN")// Ver uno o todos (USER y ADMIN)
+                        .requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")// Crear (Solo ADMIN)
+                        .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")// Actualizar (Solo ADMIN)
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")// DELETE /products/{id} -> Solo ADMIN
+                        .requestMatchers(HttpMethod.POST, "/orders/**").hasAnyRole("USER", "ADMIN")// POST /orders -> Permitido para USER y ADMIN
+
                         .anyRequest().authenticated() // Cualquier otra ruta requiere autenticación
                 )
                 .sessionManagement(session -> session
