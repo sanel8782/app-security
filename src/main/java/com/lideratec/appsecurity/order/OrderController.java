@@ -1,5 +1,6 @@
 package com.lideratec.appsecurity.order;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,7 +16,10 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody OrderRequest request, Authentication authentication) {
+    public ResponseEntity<Order> createOrder(
+            @Valid
+            @RequestBody
+            OrderRequest request, Authentication authentication) {
         // authentication.getName() extrae el username del token validado por el filtro JWT
         String username = authentication.getName();
         Order createdOrder = orderService.createOrder(request, username);

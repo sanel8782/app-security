@@ -1,5 +1,6 @@
 package com.lideratec.appsecurity.product;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,9 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product request) {
+    public ResponseEntity<Product> createProduct(
+            @Valid
+            @RequestBody Product request) {
         Product newProduct = productService.createProduct(request);
         // Retorna un código 201 Created junto con el producto guardado
         return ResponseEntity.status(HttpStatus.CREATED).body(newProduct);
@@ -34,7 +37,10 @@ public class ProductController {
 
     //actualizar (exclusivo para ADMIN por seguridad)
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product request) {
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable Long id,
+            @Valid
+            @RequestBody Product request) {
         Product updatedProduct = productService.updateProduct(id, request);
         return ResponseEntity.ok(updatedProduct);
     }

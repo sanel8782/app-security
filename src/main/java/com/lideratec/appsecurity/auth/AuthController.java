@@ -1,5 +1,6 @@
 package com.lideratec.appsecurity.auth; // O simplemente ponlo dentro del paquete com.lideratec.appsecurity
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,9 +17,10 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
-//si
+
     @PostMapping("/register")
     public ResponseEntity<String> register(
+            @Valid
             @RequestBody
             RegisterRequest request){
         try {
@@ -31,6 +33,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(
+            @Valid
             @RequestBody
             LoginRequest request) {
         String token = authService.login(request);
